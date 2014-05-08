@@ -1,6 +1,6 @@
 package com.brejza.decoder.rtty_desktop;
 
-import rtty.Waterfall;
+import graphics.Waterfall;
 
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
@@ -294,17 +294,20 @@ public class Main extends JFrame {
   			btnStop.setBounds(421, 10, 89, 23);
   			frame.add(btnStop);
   			
+  			
   			try
   			{
   			
 	  			BufferedImage grad;
-				
-				grad = ImageIO.read(new File("C:/grad.png"));
+	  
+	  			grad = ImageIO.read(this.getClass().getClassLoader().getResource("resources/grad.png"));
+				//grad = ImageIO.getr   //(new File("C:/grad.png"));
 				wf = new Waterfall(grad,200);
   			}
   			catch (Exception e)
   			{
-  				
+  				System.out.println(e);
+				//System.exit(0);
   			}
   		
 		}
@@ -350,7 +353,7 @@ public class Main extends JFrame {
 							lbStatus.setText(rcv.current_state.toString());
 						}
 						if (rcv.get_fft_updated())
-							lbWaterfall.setIcon(new ImageIcon(wf.UpdateLine(rcv.get_fft())));
+							lbWaterfall.setIcon(new ImageIcon(wf.UpdateLine(rcv.get_fft(),rcv.get_f1(),rcv.get_f2(),8000)));
 						
 						// plotint = plot.addLinePlot("my plot", c);
 					}//end if
