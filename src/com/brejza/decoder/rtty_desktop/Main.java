@@ -29,7 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 
-import rtty.rtty_receiver;
+import rtty.fsk_receiver;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -50,7 +50,7 @@ public class Main extends JFrame {
 	boolean stopCapture = false;
 	boolean restartCapture = false;
 	
-	rtty_receiver rcv = new rtty_receiver();
+	fsk_receiver rcv = new fsk_receiver();
 	
 	Waterfall wf;
 	AudioFormat af;
@@ -59,13 +59,19 @@ public class Main extends JFrame {
 	//decoder settings
 	int baud = 50;
 	
+	
+	
 	//ui elements
 	JButton btnBaud;
+	JButton btnModulation;
+	JButton btnEncoding;
 	private JPanel frame;
 	JComboBox<Object> cbAudio;
 	JTextArea txtRxChars;
 	JLabel lbStatus;
 	JLabel lbWaterfall;
+	JLabel lbEnc;
+	JLabel lbMod;
 	private JButton btnStop;
 	
 	
@@ -190,6 +196,55 @@ public class Main extends JFrame {
 			});
 		frame.add(btnBaud);
 		
+		btnEncoding = new JButton("RTTY");
+		btnEncoding.setBounds(257, 33, 57, 23);
+		btnEncoding.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+
+					if (rcv.current_mode == fsk_receiver.Mode.RTTY)
+					{
+						rcv.setMode(fsk_receiver.Mode.BINARY);
+						btnEncoding.setText("BIN");
+					}
+					else
+					{
+						rcv.setMode(fsk_receiver.Mode.RTTY);
+						btnEncoding.setText("RTTY");
+					}
+
+				}
+			});
+		frame.add(btnEncoding);
+		
+		btnModulation = new JButton("FSK");
+		btnModulation.setBounds(322, 33, 57, 23);
+		btnModulation.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+
+					if (rcv.current_modulation == fsk_receiver.Modulation.FSK)
+					{
+						rcv.setModulation(fsk_receiver.Modulation.AFSK);
+						btnModulation.setText("AFSK");
+						rcv.setFreq(500,750);
+					}
+					else
+					{
+						rcv.setModulation(fsk_receiver.Modulation.FSK);
+						btnModulation.setText("FSK");
+					}
+
+				}
+			});
+		frame.add(btnModulation);
+		
+		lbEnc = new JLabel("Encoding");
+		lbEnc.setBounds(257, 14, 56, 14);
+		frame.add(lbEnc);
+		
+		lbMod = new JLabel("Modulation");
+		lbMod.setBounds(322, 14, 77, 14);
+		frame.add(lbMod);
+		
 		JLabel lblBaud = new JLabel("Baud");
 		lblBaud.setBounds(194, 14, 46, 14);
 		frame.add(lblBaud);
@@ -250,38 +305,22 @@ public class Main extends JFrame {
   			frame.add(cbAudio);
   			
   			lbStatus = new JLabel("Idle");
-  			lbStatus.setBounds(259, 37, 108, 14);
+  			lbStatus.setBounds(400, 37, 108, 14);
   			frame.add(lbStatus);
   			
   			JLabel lblStatus2 = new JLabel("Status");
-  			lblStatus2.setBounds(257, 14, 46, 14);
+  			lblStatus2.setBounds(400, 14, 46, 14);
   			frame.add(lblStatus2);
   			
+  			/*
   			JButton btnStart = new JButton("Start");
   			btnStart.addActionListener(new ActionListener() {
-  				public void actionPerformed(ActionEvent arg0) {
-  					/*if (mixerscmbo != null)
-  					{
-  						if (mixerscmbo.length > 0 && cbAudio.getSelectedIndex() < mixerscmbo.length){
-  							Mixer.Info[] mixerInfo = AudioSystem.getMixerInfo();  
-  					        int i=0;
-  					        boolean found = false;
-  							while ( i < mixerInfo.length && !found)
-  							{
-  								if (mixerInfo[i].getName().equals(mixerscmbo[cbAudio.getSelectedIndex()]))
-  								{
-  									startAudio(mixerInfo[i]);
-  									found = true;
-  								}
-  								i++;
-  							}
-  						}
-  					}*/
+  				public void actionPerformed(ActionEvent arg0) {  					
   					startAudio();
   				}
   			});
   			
-  			btnStart.setBounds(322, 10, 89, 23);
+  			btnStart.setBounds(421, 10, 89, 23); //322
   			frame.add(btnStart);
   			
   			btnStop = new JButton("Stop");
@@ -291,9 +330,9 @@ public class Main extends JFrame {
   					//targetDataLine.close();
   				}
   			});
-  			btnStop.setBounds(421, 10, 89, 23);
+  			btnStop.setBounds(421, 35, 89, 23);
   			frame.add(btnStop);
-  			
+  			*/
   			
   			try
   			{
@@ -353,7 +392,7 @@ public class Main extends JFrame {
 							lbStatus.setText(rcv.current_state.toString());
 						}
 						if (rcv.get_fft_updated())
-							lbWaterfall.setIcon(new ImageIcon(wf.UpdateLine(rcv.get_fft(),rcv.get_f1(),rcv.get_f2(),8000)));
+							lbWaterfall.setIcon(new ImageIcon(wf.UpdateLine(rcv.get_fft(),(int)(rcv.get_f1()*1024),(int)(rcv.get_f2()*1024))));
 						
 						// plotint = plot.addLinePlot("my plot", c);
 					}//end if
