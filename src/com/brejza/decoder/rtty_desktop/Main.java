@@ -4,13 +4,11 @@ import graphics.Waterfall;
 
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Locale;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -22,20 +20,32 @@ import javax.sound.sampled.TargetDataLine;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.JTextPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
+import org.msgpack.MessagePack;
+
+import rtty.StringRxEvent;
 import rtty.fsk_receiver;
+import ukhas.Gps_coordinate;
+import ukhas.Habitat_interface;
+import ukhas.Listener;
+import ukhas.Telemetry_string;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
 
-public class Main extends JFrame {
+public class Main extends JFrame implements StringRxEvent {
 
 	
 	/**
@@ -54,6 +64,12 @@ public class Main extends JFrame {
 	
 	Waterfall wf;
 	AudioFormat af;
+	
+	Habitat_interface hi;
+	Listener li;
+	
+	private String _habitat_url = "habitat.habhub.org";
+	private String _habitat_db = "habitat";
 
 	
 	//decoder settings
@@ -65,6 +81,7 @@ public class Main extends JFrame {
 	JButton btnBaud;
 	JButton btnModulation;
 	JButton btnEncoding;
+	JButton btnUpdateUsr;
 	private JPanel frame;
 	JComboBox<Object> cbAudio;
 	JTextArea txtRxChars;
@@ -72,7 +89,16 @@ public class Main extends JFrame {
 	JLabel lbWaterfall;
 	JLabel lbEnc;
 	JLabel lbMod;
+	JScrollPane scTxtRxChars;
+	JScrollPane scTxtRxSent;
+	JTextArea txtpnBlaa;
 	private JButton btnStop;
+	
+	private JTextField txtcall = new JTextField();
+	private JTextField txtLat;
+	private JTextField txtLong;
+	private JTextField txtRad;
+	private JTextField txtAnt;
 	
 	
 	/**
@@ -171,7 +197,6 @@ public class Main extends JFrame {
 		frame.setLayout(null);
 		
 		
-		
 		JLabel lblNewLabel = new JLabel("Audio Input");
 		lblNewLabel.setBounds(10, 14, 63, 14);
 		frame.add(lblNewLabel);
@@ -195,6 +220,8 @@ public class Main extends JFrame {
 				}
 			});
 		frame.add(btnBaud);
+		
+		rcv.addStringRecievedListener(this);
 		
 		btnEncoding = new JButton("RTTY");
 		btnEncoding.setBounds(257, 33, 57, 23);
@@ -250,18 +277,129 @@ public class Main extends JFrame {
 		frame.add(lblBaud);
 		
 		lbWaterfall = new JLabel("New label");
-		lbWaterfall.setBounds(10, 313, 510, 200);
+		lbWaterfall.setBounds(10, 373, 510, 200);
 		frame.add(lbWaterfall);
 		
-		JTextPane txtpnBlaa = new JTextPane();
+		txtpnBlaa = new JTextArea();
 		txtpnBlaa.setText("blaa");
-		txtpnBlaa.setBounds(10, 65, 510, 113);
+		txtpnBlaa.setBounds(10, 125, 510, 113);
 		frame.add(txtpnBlaa);
+		
+		scTxtRxSent = new JScrollPane(txtpnBlaa);
+		scTxtRxSent.setBounds(10, 125, 510, 113);
+		frame.add(scTxtRxSent);
 		
 		txtRxChars = new JTextArea();
 		txtRxChars.setText("c");
-		txtRxChars.setBounds(10, 189, 510, 113);
-		frame.add(txtRxChars);
+		txtRxChars.setBounds(10, 249, 510, 113);
+		txtRxChars.setLineWrap(true);
+		txtRxChars.setAutoscrolls(true);
+		
+		scTxtRxChars = new JScrollPane(txtRxChars);
+		scTxtRxChars.setBounds(10, 249, 510, 113);
+		frame.add(scTxtRxChars);
+		
+		
+		
+		txtcall.setText("CALL");	
+		
+		txtcall.setBounds(64, 68, 70, 20);
+		frame.add(txtcall);
+		txtcall.setColumns(10);
+		
+		JLabel lblCallsign = new JLabel("Callsign");
+		lblCallsign.setBounds(10, 70, 46, 14);
+		frame.add(lblCallsign);
+		
+		JLabel lblpos = new JLabel("Position");
+		lblpos.setBounds(150, 70, 46, 14);
+		frame.add(lblpos);
+		
+		txtLat = new JTextField();
+		txtLat.setText("Lat");
+		txtLat.setHorizontalAlignment(SwingConstants.LEFT);
+		txtLat.setBounds(200, 68, 50, 20);
+		frame.add(txtLat);
+		txtLat.setColumns(10);
+		
+		txtLong = new JTextField();
+		txtLong.setText("Long");
+		txtLong.setBounds(254, 68, 50, 20);
+		frame.add(txtLong);
+		txtLong.setColumns(10);
+		
+		
+		JLabel lblrad = new JLabel("Radio");
+		lblrad.setBounds(10, 100, 46, 14);
+		frame.add(lblrad);
+		
+		txtRad = new JTextField();
+		txtRad.setText("");
+		txtRad.setHorizontalAlignment(SwingConstants.LEFT);
+		txtRad.setBounds(50, 98, 200, 20);
+		frame.add(txtRad);
+		txtRad.setColumns(20);
+		
+		JLabel lblant = new JLabel("Antenna");
+		lblant.setBounds(265, 100, 53, 14);
+		frame.add(lblant);
+		
+		txtAnt = new JTextField();
+		txtAnt.setText("");
+		txtAnt.setHorizontalAlignment(SwingConstants.LEFT);
+		txtAnt.setBounds(320, 98, 200, 20);
+		frame.add(txtAnt);
+		txtAnt.setColumns(20);
+
+		
+			
+		DocumentListener du = new DocumentListener() {			
+			public void changedUpdate(DocumentEvent arg0) {
+				btnUpdateUsr.setEnabled(true);
+			}
+			public void insertUpdate(DocumentEvent arg0) {
+				btnUpdateUsr.setEnabled(true);
+			}
+			public void removeUpdate(DocumentEvent arg0) {
+				btnUpdateUsr.setEnabled(true);
+			}			
+		};
+		
+		txtAnt.getDocument().addDocumentListener(du);
+		txtRad.getDocument().addDocumentListener(du);
+		txtcall.getDocument().addDocumentListener(du);
+		txtLat.getDocument().addDocumentListener(du);
+		txtLong.getDocument().addDocumentListener(du);
+		
+		li = new Listener(txtcall.getText(), new Gps_coordinate(txtLat.getText(),txtLong.getText(),""),false);
+		
+		btnUpdateUsr = new JButton("Update");
+		btnUpdateUsr.setBounds(400, 68, 75, 23);
+		btnUpdateUsr.setEnabled(false);
+		btnUpdateUsr.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+
+					try{
+						Gps_coordinate g = new Gps_coordinate(Double.parseDouble(txtLat.getText()),
+								Double.parseDouble(txtLong.getText()),0);
+						li.set_Gps_coordinates(g);
+					}catch (Exception e)
+					{
+						
+					}					
+					if (!li.CallSign().equals(txtcall.getText()) )					
+						li.SetCallSign(txtcall.getText());
+					if (!li.getAntenna().equals(txtAnt.getText()))
+						li.setAntenna(txtAnt.getText());
+					if (!li.getRadio().equals(txtRad.getText()))
+						li.setRadio(txtRad.getText());	
+					//TODO: radio
+					
+					btnUpdateUsr.setEnabled(false);
+						
+				}
+			});
+		frame.add(btnUpdateUsr);
 		
 		
 		
@@ -334,6 +472,8 @@ public class Main extends JFrame {
   			frame.add(btnStop);
   			*/
   			
+  			hi = new Habitat_interface(_habitat_url, _habitat_db, li);
+  			
   			try
   			{
   			
@@ -388,7 +528,7 @@ public class Main extends JFrame {
 						if (rcv.get_fft_updated())
 						{
 						 
-						//	scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());//getHeight());
+							scTxtRxChars.getVerticalScrollBar().setValue(scTxtRxChars.getVerticalScrollBar().getMaximum());//getHeight());
 							lbStatus.setText(rcv.current_state.toString());
 						}
 						if (rcv.get_fft_updated())
@@ -427,4 +567,53 @@ public class Main extends JFrame {
 
 	    }
 	} */
+
+	public void StringRx(String strrx, boolean checksum) {
+		// TODO Auto-generated method stub
+		if (checksum){
+			
+				
+			
+			
+			scTxtRxSent.getVerticalScrollBar().setValue(scTxtRxSent.getVerticalScrollBar().getMaximum());//getHeight());
+			
+			Telemetry_string ts = new Telemetry_string(strrx,null);
+			txtpnBlaa.append(ts.getSentence());
+			
+			
+			hi.upload_payload_telem(ts);
+		}
+	}
+
+	public void StringRx(byte[] strrx, boolean checksum, int length, int flags) {
+		// TODO Auto-generated method stub
+		if (checksum){
+			
+			for (int i = 0; i < strrx.length; i++)			
+				txtpnBlaa.append(" " + toHexString(((int)strrx[i])&0xFF));
+			txtpnBlaa.append("\n");
+			scTxtRxSent.getVerticalScrollBar().setValue(scTxtRxSent.getVerticalScrollBar().getMaximum());//getHeight());
+			
+			Telemetry_string ts = new Telemetry_string(strrx,null);
+			
+			ts.habitat_metadata = new HashMap<String,String>();
+			ts.habitat_metadata.put("receiver_flags", Integer.toHexString(flags));
+			
+			byte [][] a = Telemetry_string.gen_telem_mask(strrx);
+			rcv.provide_binary_sync_helper(a[0],a[1],ts.callsign.toUpperCase(Locale.US), length);
+			
+			txtpnBlaa.append(ts.getSentence());
+			
+			hi.upload_payload_telem(ts);
+		}
+	}
+	
+	private static String toHexString(int input)
+	{
+		String output = "";
+		output = Integer.toHexString(input);
+		if (output.length() == 1)
+			output = "0"+output;
+		return output;
+	}
 }
