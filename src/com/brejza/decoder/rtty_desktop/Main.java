@@ -202,7 +202,7 @@ public class Main extends JFrame implements StringRxEvent {
 		frame.add(lblNewLabel);
 		
 		btnBaud = new JButton("50");
-		btnBaud.setBounds(194, 33, 57, 23);
+		btnBaud.setBounds(194, 33, 70, 23);
 		btnBaud.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 
@@ -224,7 +224,7 @@ public class Main extends JFrame implements StringRxEvent {
 		rcv.addStringRecievedListener(this);
 		
 		btnEncoding = new JButton("RTTY");
-		btnEncoding.setBounds(257, 33, 57, 23);
+		btnEncoding.setBounds(270, 33, 70, 23);
 		btnEncoding.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 
@@ -244,7 +244,7 @@ public class Main extends JFrame implements StringRxEvent {
 		frame.add(btnEncoding);
 		
 		btnModulation = new JButton("FSK");
-		btnModulation.setBounds(322, 33, 57, 23);
+		btnModulation.setBounds(350, 33, 70, 23);
 		btnModulation.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 
@@ -265,15 +265,15 @@ public class Main extends JFrame implements StringRxEvent {
 		frame.add(btnModulation);
 		
 		lbEnc = new JLabel("Encoding");
-		lbEnc.setBounds(257, 14, 56, 14);
+		lbEnc.setBounds(270, 14, 100, 14);
 		frame.add(lbEnc);
 		
 		lbMod = new JLabel("Modulation");
-		lbMod.setBounds(322, 14, 77, 14);
+		lbMod.setBounds(350, 14, 100, 14);
 		frame.add(lbMod);
 		
 		JLabel lblBaud = new JLabel("Baud");
-		lblBaud.setBounds(194, 14, 46, 14);
+		lblBaud.setBounds(194, 14, 100, 14);
 		frame.add(lblBaud);
 		
 		lbWaterfall = new JLabel("New label");
@@ -281,7 +281,7 @@ public class Main extends JFrame implements StringRxEvent {
 		frame.add(lbWaterfall);
 		
 		txtpnBlaa = new JTextArea();
-		txtpnBlaa.setText("blaa");
+		txtpnBlaa.setText("");
 		txtpnBlaa.setBounds(10, 125, 510, 113);
 		frame.add(txtpnBlaa);
 		
@@ -290,7 +290,7 @@ public class Main extends JFrame implements StringRxEvent {
 		frame.add(scTxtRxSent);
 		
 		txtRxChars = new JTextArea();
-		txtRxChars.setText("c");
+		txtRxChars.setText("");
 		txtRxChars.setBounds(10, 249, 510, 113);
 		txtRxChars.setLineWrap(true);
 		txtRxChars.setAutoscrolls(true);
@@ -308,11 +308,11 @@ public class Main extends JFrame implements StringRxEvent {
 		txtcall.setColumns(10);
 		
 		JLabel lblCallsign = new JLabel("Callsign");
-		lblCallsign.setBounds(10, 70, 46, 14);
+		lblCallsign.setBounds(10, 70, 100, 14);
 		frame.add(lblCallsign);
 		
 		JLabel lblpos = new JLabel("Position");
-		lblpos.setBounds(150, 70, 46, 14);
+		lblpos.setBounds(150, 70, 100, 14);
 		frame.add(lblpos);
 		
 		txtLat = new JTextField();
@@ -330,7 +330,7 @@ public class Main extends JFrame implements StringRxEvent {
 		
 		
 		JLabel lblrad = new JLabel("Radio");
-		lblrad.setBounds(10, 100, 46, 14);
+		lblrad.setBounds(10, 100, 100, 14);
 		frame.add(lblrad);
 		
 		txtRad = new JTextField();
@@ -341,7 +341,7 @@ public class Main extends JFrame implements StringRxEvent {
 		txtRad.setColumns(20);
 		
 		JLabel lblant = new JLabel("Antenna");
-		lblant.setBounds(265, 100, 53, 14);
+		lblant.setBounds(265, 100, 100, 14);
 		frame.add(lblant);
 		
 		txtAnt = new JTextField();
@@ -374,7 +374,7 @@ public class Main extends JFrame implements StringRxEvent {
 		li = new Listener(txtcall.getText(), new Gps_coordinate(txtLat.getText(),txtLong.getText(),""),false);
 		
 		btnUpdateUsr = new JButton("Update");
-		btnUpdateUsr.setBounds(400, 68, 75, 23);
+		btnUpdateUsr.setBounds(400, 68, 118, 23);
 		btnUpdateUsr.setEnabled(false);
 		btnUpdateUsr.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
@@ -443,11 +443,11 @@ public class Main extends JFrame implements StringRxEvent {
   			frame.add(cbAudio);
   			
   			lbStatus = new JLabel("Idle");
-  			lbStatus.setBounds(400, 37, 108, 14);
+  			lbStatus.setBounds(440, 37, 108, 14);
   			frame.add(lbStatus);
   			
   			JLabel lblStatus2 = new JLabel("Status");
-  			lblStatus2.setBounds(400, 14, 46, 14);
+  			lblStatus2.setBounds(440, 14, 100, 14);
   			frame.add(lblStatus2);
   			
   			/*
