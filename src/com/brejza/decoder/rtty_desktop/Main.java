@@ -589,8 +589,12 @@ public class Main extends JFrame implements StringRxEvent {
 		// TODO Auto-generated method stub
 		if (checksum){
 			
-			for (int i = 0; i < strrx.length; i++)			
+			String binary_str = "";
+			
+			for (int i = 0; i < strrx.length; i++){
 				txtpnBlaa.append(" " + toHexString(((int)strrx[i])&0xFF));
+				binary_str = binary_str + " " + toHexString(((int)strrx[i])&0xFF);
+			}
 			txtpnBlaa.append("\n");
 			scTxtRxSent.getVerticalScrollBar().setValue(scTxtRxSent.getVerticalScrollBar().getMaximum());//getHeight());
 			
@@ -598,6 +602,7 @@ public class Main extends JFrame implements StringRxEvent {
 			
 			ts.habitat_metadata = new HashMap<String,String>();
 			ts.habitat_metadata.put("receiver_flags", Integer.toHexString(flags));
+			ts.habitat_metadata.put("raw_binary", binary_str);
 			
 			byte [][] a = Telemetry_string.gen_telem_mask(strrx);
 			rcv.provide_binary_sync_helper(a[0],a[1],ts.callsign.toUpperCase(Locale.US), length);
