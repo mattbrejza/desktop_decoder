@@ -521,7 +521,7 @@ public class Main extends JFrame implements StringRxEvent {
 	
 						//txtDecode.append(rcv.processBlock(a,300));
 
-						txtRxChars.append(rcv.processBlock(a,50));
+						txtRxChars.append(rcv.processBlock(a,baud));
 							 
 						
 						  
@@ -585,7 +585,7 @@ public class Main extends JFrame implements StringRxEvent {
 		}
 	}
 
-	public void StringRx(byte[] strrx, boolean checksum, int length, int flags) {
+	public void StringRx(byte[] strrx, boolean checksum, int length, int flags, int fixed) {
 		// TODO Auto-generated method stub
 		if (checksum){
 			
@@ -598,6 +598,7 @@ public class Main extends JFrame implements StringRxEvent {
 			
 			ts.habitat_metadata = new HashMap<String,String>();
 			ts.habitat_metadata.put("receiver_flags", Integer.toHexString(flags));
+			ts.habitat_metadata.put("fec_fixed", Integer.toString(fixed));
 			
 			byte [][] a = Telemetry_string.gen_telem_mask(strrx);
 			rcv.provide_binary_sync_helper(a[0],a[1],ts.callsign.toUpperCase(Locale.US), length);
